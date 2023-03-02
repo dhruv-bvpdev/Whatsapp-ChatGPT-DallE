@@ -1,0 +1,9 @@
+version: '3'
+services:
+  whatsapp-chatgpt-dalle:
+    image: ghcr.io/dhruv-bvpdev/Whatsapp-ChatGPT-DallE:latest
+    environment:
+      OPENAI_API_KEY: ""
+      PREFIX_ENABLED: ""
+      GPT_PREFIX: ""
+      DALLE_PREFIX: ""
