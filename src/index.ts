@@ -3,6 +3,7 @@ import qrcode from 'qrcode-terminal'
 import { Client, Message } from 'whatsapp-web.js'
 import { handleMessageGPT } from './gpt'
 import { handleMessageDALLE } from './dalle'
+import { handleMessageCONFIG } from './config'
 
 //* Environment variables
 dotenv.config()
@@ -14,6 +15,7 @@ const statusBroadcast = 'status@broadcast'
 const prefixEnabled = process.env.PREFIX_ENABLED == 'true'
 const gptPrefix = process.env.GPT_PREFIX || '!gpt'
 const dallePrefix = process.env.GPT_PREFIX || '!dalle'
+const configPrefix = '!config'
 
 //* Whatsapp Client
 const client = new Client({
@@ -21,6 +23,10 @@ const client = new Client({
     args: ['--no-sandbox']
   }
 })
+
+function startsWithIgnoreCase(str, prefix) {
+  return str.toLowerCase().startsWith(prefix.toLowerCase())
+}
 
 //* Handles message
 async function sendMessage(message: Message) {
@@ -35,16 +41,23 @@ async function sendMessage(message: Message) {
   }
 
   //* GPT (!gpt <prompt>)
-  if (messageString.startsWith(gptPrefix)) {
+  if (startsWithIgnoreCase(messageString, gptPrefix)) {
     const prompt = messageString.substring(gptPrefix.length + 1)
     await handleMessageGPT(message, prompt)
     return
   }
 
   //* DALLE (!dalle <prompt>)
-  if (messageString.startsWith(dallePrefix)) {
+  if (startsWithIgnoreCase(messageString, dallePrefix)) {
     const prompt = messageString.substring(dallePrefix.length + 1)
     await handleMessageDALLE(message, prompt)
+    return
+  }
+
+  //* Config (!config <prompt>)
+  if (messageString.startsWith(configPrefix)) {
+    const prompt = messageString.substring(configPrefix.length + 1)
+    await handleMessageCONFIG(message, prompt)
     return
   }
 }
