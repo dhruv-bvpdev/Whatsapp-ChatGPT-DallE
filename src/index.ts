@@ -1,23 +1,14 @@
-import dotenv from 'dotenv'
 import qrcode from 'qrcode-terminal'
 import { Client, Message, Events } from 'whatsapp-web.js'
-import { handleMessageGPT } from './gpt'
-import { handleMessageDALLE } from './dalle'
+import { handleMessageGPT } from './handlers/gpt'
+import { handleMessageDALLE } from './handlers/dalle'
 import { handleMessageAICONFIG } from './ai-config'
 import { startsWithIgnoreCase } from './utils'
-import * as cli from '../cli/ui'
-
-//* Environment variables
-dotenv.config()
+import * as cli from './cli/ui'
+import config from './config'
 
 //* Whatsapp status (status@broadcast)
 const statusBroadcast = 'status@broadcast'
-
-//* Prefixes
-const prefixEnabled = process.env.PREFIX_ENABLED == 'true'
-const gptPrefix = process.env.GPT_PREFIX || '!gpt'
-const dallePrefix = process.env.GPT_PREFIX || '!dalle'
-const aiConfigPrefix = '!aiconfig'
 
 //* Whatsapp Client
 const client = new Client({
@@ -27,34 +18,32 @@ const client = new Client({
 })
 
 //* Handles message
-async function sendMessage(message: Message) {
+async function handleIncomingMessage(message: Message) {
   const messageString = message.body
 
-  if (messageString.length == 0) return
-
-  if (!prefixEnabled) {
+  if (!config.prefixEnabled) {
     //* GPT (only <prompt>)
     await handleMessageGPT(message, messageString)
     return
   }
 
   //* GPT (!gpt <prompt>)
-  if (startsWithIgnoreCase(messageString, gptPrefix)) {
-    const prompt = messageString.substring(gptPrefix.length + 1)
+  if (startsWithIgnoreCase(messageString, config.gptPrefix)) {
+    const prompt = messageString.substring(config.gptPrefix.length + 1)
     await handleMessageGPT(message, prompt)
     return
   }
 
   //* DALLE (!dalle <prompt>)
-  if (startsWithIgnoreCase(messageString, dallePrefix)) {
-    const prompt = messageString.substring(dallePrefix.length + 1)
+  if (startsWithIgnoreCase(messageString, config.dallePrefix)) {
+    const prompt = messageString.substring(config.dallePrefix.length + 1)
     await handleMessageDALLE(message, prompt)
     return
   }
 
   //* Config (!dalle <prompt>)
-  if (messageString.startsWith(aiConfigPrefix)) {
-    const prompt = messageString.substring(aiConfigPrefix.length + 1) //! Possible Error Point
+  if (messageString.startsWith(config.aiConfigPrefix)) {
+    const prompt = messageString.substring(config.aiConfigPrefix.length + 1) //! Possible Error Point
     await handleMessageAICONFIG(message, prompt)
     return
   }
@@ -94,7 +83,7 @@ const start = async () => {
 
     // Ignore if it's a quoted message, (e.g. GPT reply)
     if (message.hasQuotedMsg) return
-    await sendMessage(message)
+    await handleIncomingMessage(message)
   })
 
   //* reply to own message
@@ -112,7 +101,7 @@ const start = async () => {
     //* Ignore if it's not from me
     if (!message.fromMe) return
 
-    await sendMessage(message)
+    await handleIncomingMessage(message)
   })
 
   //* Whatsapp Initialization

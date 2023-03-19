@@ -1,12 +1,16 @@
-import { intro, spinner, note, outro } from '@clack/prompts'
+import { intro, spinner, note, outro, text } from '@clack/prompts'
 import color from 'picocolors'
 
 const s = spinner()
 
+export const print = (text: string) => {
+  console.log(color.green('◇') + '  ' + text)
+}
+
 export const printIntro = () => {
-  intro(color.bgCyan(color.white(' Whatsapp ChatGPT & DALLE ')))
+  intro(color.bgCyan(color.white(' Whatsapp ChatGPT & DALL-E ')))
   note(
-    "A Whatsapp bot that uses OpenAI's ChatGPT and DALLE to generate text and images from a prompt."
+    "A Whatsapp bot that uses OpenAI's ChatGPT and DALL-E to generate text and images from a prompt."
   )
   s.start('Starting')
 }
