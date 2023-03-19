@@ -1,17 +1,20 @@
+import { Message } from 'whatsapp-web.js'
 import {
   aiConfigTarget,
   aiConfigTypes,
-  aiConfigValues
-} from './types/ai-config'
+  aiConfigValues,
+  IAiConfig
+} from '../types/ai-config'
+import { dalleImageSize } from '../types/dalle-config'
 
-const aiConfig = {
+const aiConfig: IAiConfig = {
   dalle: {
-    size: '512x512'
+    size: dalleImageSize['512x512']
   }
   // chatgpt: {}
 }
 
-const handleMessageAICONFIG = async (message: any, prompt: any) => {
+const handleMessageAIConfig = async (message: Message, prompt: any) => {
   try {
     console.log(
       '[Whatsapp Config] Received prompt from ' + message.from + ': ' + prompt
@@ -19,9 +22,26 @@ const handleMessageAICONFIG = async (message: any, prompt: any) => {
 
     const args: string[] = prompt.split(' ')
 
-    if (args.length !== 3) {
+    if (prompt === 'help') {
+      let helpMessage = 'Available commands:\n'
+      for (let target in aiConfigTarget) {
+        for (let type in aiConfigTypes[target]) {
+          helpMessage += `\t!config ${target} ${type} <value> - Set ${target} ${type} to <value>\n`
+        }
+      }
+      helpMessage += '\nAvailable values:\n'
+      for (let target in aiConfigTarget) {
+        for (let type in aiConfigTypes[target]) {
+          helpMessage += `\t${target} ${type}: ${Object.keys(
+            aiConfigValues[target][type]
+          ).join(', ')}\n`
+        }
+      }
+      message.reply(helpMessage)
+      return
+    } else if (args.length !== 3) {
       message.reply(
-        'Invalid number of arguments, please use the following format: <target> <type> <value>'
+        'Invalid number of arguments, please use the following format: <target> <type> <value> or type !config help for more information.'
       )
       return
     }
@@ -67,4 +87,4 @@ const handleMessageAICONFIG = async (message: any, prompt: any) => {
   }
 }
 
-export { aiConfig, handleMessageAICONFIG }
+export { aiConfig, handleMessageAIConfig }

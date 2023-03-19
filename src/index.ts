@@ -2,13 +2,11 @@ import qrcode from 'qrcode-terminal'
 import { Client, Message, Events } from 'whatsapp-web.js'
 import { handleMessageGPT } from './handlers/gpt'
 import { handleMessageDALLE } from './handlers/dalle'
-import { handleMessageAICONFIG } from './ai-config'
+import { handleMessageAIConfig } from './handlers/ai-config'
 import { startsWithIgnoreCase } from './utils'
 import * as cli from './cli/ui'
 import config from './config'
-
-//* Whatsapp status (status@broadcast)
-const statusBroadcast = 'status@broadcast'
+import constants from './constants'
 
 //* Whatsapp Client
 const client = new Client({
@@ -41,10 +39,10 @@ async function handleIncomingMessage(message: Message) {
     return
   }
 
-  //* Config (!dalle <prompt>)
-  if (messageString.startsWith(config.aiConfigPrefix)) {
-    const prompt = messageString.substring(config.aiConfigPrefix.length + 1) //! Possible Error Point
-    await handleMessageAICONFIG(message, prompt)
+  //* AiConfig (!config <prompt>)
+  if (startsWithIgnoreCase(messageString, config.aiConfigPrefix)) {
+    const prompt = messageString.substring(config.aiConfigPrefix.length + 1)
+    await handleMessageAIConfig(message, prompt)
     return
   }
 }
@@ -75,7 +73,7 @@ const start = async () => {
   //* Whatsapp message
   client.on(Events.MESSAGE_RECEIVED, async (message: any) => {
     // Ignore if message is from status broadcast
-    if (message.from == statusBroadcast) return
+    if (message.from == constants.statusBroadcast) return
 
     // Ignore if message is empty or media
     if (message.body.length == 0) return
@@ -89,7 +87,7 @@ const start = async () => {
   //* reply to own message
   client.on(Events.MESSAGE_CREATE, async (message: Message) => {
     //* Ignore if message is from status broadcast
-    if (message.from == statusBroadcast) return
+    if (message.from == constants.statusBroadcast) return
 
     //* Ignore if message is empty or media
     if (message.body.length == 0) return
