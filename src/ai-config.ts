@@ -1,4 +1,3 @@
-import { Message } from 'whatsapp-web.js'
 import {
   aiConfigTarget,
   aiConfigTypes,
