@@ -3,7 +3,7 @@ import qrcode from 'qrcode-terminal'
 import { Client, Message } from 'whatsapp-web.js'
 import { handleMessageGPT } from './gpt'
 import { handleMessageDALLE } from './dalle'
-import { handleMessageCONFIG } from './config'
+import { handleMessageAICONFIG } from './ai-config'
 
 //* Environment variables
 dotenv.config()
@@ -15,7 +15,7 @@ const statusBroadcast = 'status@broadcast'
 const prefixEnabled = process.env.PREFIX_ENABLED == 'true'
 const gptPrefix = process.env.GPT_PREFIX || '!gpt'
 const dallePrefix = process.env.GPT_PREFIX || '!dalle'
-const configPrefix = '!config'
+const aiConfigPrefix = '!aiconfig'
 
 //* Whatsapp Client
 const client = new Client({
@@ -54,10 +54,10 @@ async function sendMessage(message: Message) {
     return
   }
 
-  //* Config (!config <prompt>)
-  if (messageString.startsWith(configPrefix)) {
-    const prompt = messageString.substring(configPrefix.length + 1)
-    await handleMessageCONFIG(message, prompt)
+  //* Config (!dalle <prompt>)
+  if (messageString.startsWith(aiConfigPrefix)) {
+    const prompt = messageString.substring(aiConfigPrefix.length + 1) //! Possible Error Point
+    await handleMessageAICONFIG(message, prompt)
     return
   }
 }

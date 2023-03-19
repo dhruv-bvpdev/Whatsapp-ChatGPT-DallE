@@ -1,14 +1,18 @@
 import { Message } from 'whatsapp-web.js'
-import { configTarget } from './types'
+import {
+  aiConfigTarget,
+  aiConfigTypes,
+  aiConfigValues
+} from './types/ai-config'
 
-const config = {
+const aiConfig = {
   dalle: {
     size: '512x512'
   }
   // chatgpt: {}
 }
 
-const handleMessageCONFIG = async (message: any, prompt: any): void => {
+const handleMessageAICONFIG = async (message: any, prompt: any) => {
   try {
     console.log(
       '[Whatsapp Config] Received prompt from ' + message.from + ': ' + prompt
@@ -27,31 +31,31 @@ const handleMessageCONFIG = async (message: any, prompt: any): void => {
     const type: string = args[1]
     const value: string = args[2]
 
-    if (!(target in configTarget)) {
+    if (!(target in aiConfigTarget)) {
       message.reply(
         'Invalid target, please use one of the following: ' +
-          Object.keys(configTarget).join(', ')
+          Object.keys(aiConfigTarget).join(', ')
       )
       return
     }
 
-    if (!(type in config[target])) {
+    if (!(type in aiConfigTypes[target])) {
       message.reply(
         'Invalid type, please use one of the following: ' +
-          Object.keys(config[target]).join(', ')
+          Object.keys(aiConfigTypes[target]).join(', ')
       )
       return
     }
 
-    if (!(value in config[target][type])) {
+    if (!(value in aiConfigValues[target][type])) {
       message.reply(
         'Invalid value, please use one of the following: ' +
-          Object.keys(config[target][type]).join(', ')
+          Object.keys(aiConfigValues[target][type]).join(', ')
       )
       return
     }
 
-    config[target][type] = value
+    aiConfig[target][type] = value
 
     message.reply('Successfully set ' + target + ' ' + type + ' to ' + value)
   } catch (error: any) {
@@ -64,4 +68,4 @@ const handleMessageCONFIG = async (message: any, prompt: any): void => {
   }
 }
 
-export { config, handleMessageCONFIG }
+export { aiConfig, handleMessageAICONFIG }
