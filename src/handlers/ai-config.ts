@@ -17,7 +17,7 @@ const aiConfig: IAiConfig = {
 const handleMessageAIConfig = async (message: Message, prompt: any) => {
   try {
     console.log(
-      '[Whatsapp Config] Received prompt from ' + message.from + ': ' + prompt
+      '[AI-Config] Received prompt from ' + message.from + ': ' + prompt
     )
 
     const args: string[] = prompt.split(' ')
