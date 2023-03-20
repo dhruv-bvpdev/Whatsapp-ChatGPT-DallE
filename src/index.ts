@@ -1,5 +1,5 @@
 import qrcode from 'qrcode-terminal'
-import { Client, Message, Events } from 'whatsapp-web.js'
+import { Client, Message, Events, LocalAuth } from 'whatsapp-web.js'
 import { handleMessageGPT } from './handlers/gpt'
 import { handleMessageDALLE } from './handlers/dalle'
 import { handleMessageAIConfig } from './handlers/ai-config'
@@ -7,13 +7,6 @@ import { startsWithIgnoreCase } from './utils'
 import * as cli from './cli/ui'
 import config from './config'
 import constants from './constants'
-
-//* Whatsapp Client
-const client = new Client({
-  puppeteer: {
-    args: ['--no-sandbox']
-  }
-})
 
 //* Handles message
 async function handleIncomingMessage(message: Message) {
@@ -51,6 +44,16 @@ async function handleIncomingMessage(message: Message) {
 const start = async () => {
   cli.printIntro()
 
+  //* Whatsapp Client
+  const client = new Client({
+    puppeteer: {
+      args: ['--no-sandbox']
+    },
+    authStrategy: new LocalAuth({
+      dataPath: constants.sessionPath
+    })
+  })
+
   //* Whatsapp auth
   client.on(Events.QR_RECEIVED, (qr: string) => {
     qrcode.generate(qr, { small: true }, (qrcode: string) => {
@@ -63,6 +66,14 @@ const start = async () => {
     if (percent == '0') {
       cli.printLoading()
     }
+  })
+
+  client.on(Events.AUTHENTICATED, () => {
+    cli.printAuthenticated()
+  })
+
+  client.on(Events.AUTHENTICATION_FAILURE, () => {
+    cli.print('Automatic Authentication failed!')
   })
 
   //* Whatsapp ready
