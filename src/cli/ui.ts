@@ -17,13 +17,18 @@ export const printIntro = () => {
 
 export const printQRCode = (qr: string) => {
   s.stop('Client is ready!')
-  note(qr, 'Scan the QR code above to login to Whatsapp Web.')
+  note(qr, 'Scan the QR code below to login to Whatsapp Web.')
   s.start('Waiting for QR code to be scanned')
 }
 
 export const printLoading = () => {
   s.stop('Authenticated!')
   s.start('Logging in')
+}
+
+export const printAuthenticated = () => {
+  s.stop('Session started!')
+  s.start('Opening session')
 }
 
 export const printOutro = () => {
