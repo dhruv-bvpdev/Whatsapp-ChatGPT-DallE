@@ -1,4 +1,6 @@
 interface IConstants {
+  // Speech API
+  speechServerUrl: string
   // WhatsApp status broadcast
   statusBroadcast: string
   // WhatsApp session storage
@@ -6,6 +8,7 @@ interface IConstants {
 }
 
 const constants: IConstants = {
+  speechServerUrl: 'https://speech-service.verlekar.com',
   statusBroadcast: 'status@broadcast',
   sessionPath: './'
 }
